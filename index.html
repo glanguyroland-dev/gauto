@@ -130,6 +130,29 @@ textarea::placeholder{color:#383838}
 .force-tag{background:#0a150f;border:1px solid #1a3a24;color:var(--vert);font-size:.58rem;padding:3px 9px;border-radius:20px}
 
 ::-webkit-scrollbar{width:3px}
+
+/* MODAL CLÉ API */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center}
+.modal{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:36px;max-width:480px;width:90%;position:relative}
+.modal-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;margin-bottom:4px}
+.modal-logo span{color:var(--or)}
+.modal-sub{font-size:.6rem;color:var(--gclair);letter-spacing:.12em;text-transform:uppercase;margin-bottom:24px}
+.modal h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;margin-bottom:8px}
+.modal p{font-size:.72rem;color:var(--gclair);line-height:1.7;margin-bottom:20px}
+.modal input{width:100%;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:7px;color:var(--blanc);font-family:'DM Mono',monospace;font-size:.72rem;padding:12px 14px;outline:none;transition:border-color .2s;margin-bottom:8px}
+.modal input:focus{border-color:var(--or)}
+.modal input::placeholder{color:#3a3a3a}
+.modal-hint{font-size:.6rem;color:var(--gclair);margin-bottom:20px;line-height:1.6}
+.modal-hint a{color:var(--or);text-decoration:none}
+.modal-btn{background:var(--or);color:var(--noir);border:none;border-radius:7px;padding:13px;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;width:100%;transition:all .2s;margin-bottom:10px}
+.modal-btn:hover{background:var(--or2)}
+.modal-skip{background:transparent;color:var(--gclair);border:1px solid var(--border);border-radius:7px;padding:10px;font-family:'DM Mono',monospace;font-size:.62rem;cursor:pointer;width:100%;transition:all .2s;letter-spacing:.08em}
+.modal-skip:hover{border-color:var(--gclair);color:var(--blanc)}
+.modal-err{font-size:.62rem;color:#e07070;margin-bottom:10px;display:none}
+.modal-err.on{display:block}
+.api-indicator{display:flex;align-items:center;gap:6px;font-size:.58rem;cursor:pointer;padding:4px 10px;border:1px solid transparent;border-radius:20px;transition:all .2s}
+.api-indicator:hover{border-color:var(--border)}
+.api-indicator .dot-or{width:6px;height:6px;border-radius:50%;background:var(--or)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
@@ -143,9 +166,27 @@ textarea::placeholder{color:#383838}
 </head>
 <body>
 
+<!-- MODAL CLÉ API -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-logo">G<span>.</span>AUTO</div>
+    <div class="modal-sub">Moteur de candidature · Glan Guy Roland</div>
+    <h2>Configuration de l'API</h2>
+    <p>Entre ta clé API Anthropic pour activer la génération automatique de CV et lettres de motivation adaptées à chaque offre.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off">
+    <div class="modal-hint">
+      Obtiens ta clé sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> (5$ de crédit = plusieurs mois d'utilisation).<br>
+      Ta clé est sauvegardée uniquement dans <strong>ton navigateur</strong> — personne d'autre ne peut y accéder.
+    </div>
+    <div class="modal-err" id="modalErr">Clé invalide. Elle doit commencer par sk-ant-</div>
+    <button class="modal-btn" onclick="sauvegarderCle()">✓ Activer G.AUTO</button>
+    <button class="modal-skip" onclick="fermerModal()">Continuer sans clé API (fonctionnalités limitées)</button>
+  </div>
+</div>
+
 <header>
   <div class="logo">G<span>.</span>AUTO<sub>by Glan Guy Roland</sub></div>
-  <div class="status"><div class="dot"></div>Claude API · Actif</div>
+  <div class="api-indicator" onclick="afficherModal()" id="apiIndicator"><div class="dot" id="apiDot"></div><span id="apiLabel">Claude API · Configurer</span></div>
 </header>
 
 <nav>
@@ -291,7 +332,8 @@ const OFFRES = [
   {id:3,titre:"ASSISTANTE DE DIRECTION",entreprise:"Cabinet Eburka Conseils",source:"GoAfrica Online",url:"https://www.goafricaonline.com/ci/emploi/job-18879-assistante-de-direction",deadline:"Non précisée",urgent:false,score:62,desc:"Coordination administrative et opérationnelle du dirigeant. 5 à 8 ans d'expérience, contexte cabinet conseil.",tags:["Cabinet Conseil","Coordination","Abidjan"]}
 ];
 
-const API_KEY = ""; // Laisse vide — le fichier fonctionne sans clé API grâce à claude.ai
+// Clé API récupérée depuis le stockage local du navigateur
+function getApiKey(){ return localStorage.getItem('gauto_api_key') || ''; }
 
 let offres = [...OFFRES];
 let result = null;
@@ -316,7 +358,7 @@ async function scorer(){
   const t=setInterval(()=>{if(i<steps.length){fill.style.width=steps[i][0]+'%';txt.textContent=steps[i][1];i++;}},700);
   try{
     const prompt='Tu analyses la correspondance entre ce candidat et ces offres emploi en Côte d\'Ivoire (depuis avril 2026).\n\nPROFIL RÉSUMÉ :\n'+PROFIL.slice(0,600)+'\n\nOFFRES :\n'+OFFRES.map((o,i)=>i+'. "'+o.titre+'" chez '+o.entreprise+' — '+o.desc).join('\n')+'\n\nRéponds UNIQUEMENT en JSON : [{"index":0,"score":88,"just":"...","conseil":"..."},...]';
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,messages:[{role:"user",content:prompt}]})});
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey()},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,messages:[{role:"user",content:prompt}]})});
     const d=await r.json();
     const raw=d.content?.find(b=>b.type==='text')?.text||'';
     const a=JSON.parse(raw.replace(/```json|```/g,'').trim());
@@ -377,7 +419,7 @@ async function generer(){
   const prompt='Tu es expert RH en Côte d\'Ivoire. Génère une candidature complète et personnalisée.\n\n'+PROFIL+'\n\nOFFRE D\'EMPLOI :\n'+offre+'\n\nRéponds UNIQUEMENT en JSON valide :\n{"score":<0-100>,"score_just":"<2 phrases>","criteres":["c1","c2","c3","c4","c5"],"manquants":["m1"],"titre_adapte":"<titre exact>","entreprise":"<nom entreprise>","cv_profil":"<3-4 phrases profil adapté à CE poste>","cv_exp1":"<missions CRAS reformulées, 4 points séparés par |>","cv_exp2":"<missions CEP reformulées, 3 points séparés par |>","cv_exp3":"<missions Dir.Cab reformulées, 4 points séparés par |>","cv_exp4":"<missions Chef Cab reformulées, 3 points séparés par |>","cv_comp":"<compétences clés pour ce poste>","lm_p1":"<accroche personnalisée, 4-5 lignes>","lm_p2":"<expérience ministérielle + promotion, 4-5 lignes>","lm_encadre":"<réalisation forte : Conseil des ministres/Ayamé ou autre, 3-4 lignes>","lm_p3":"<CEP autonomie + CRAS projets (sans détails), 3-4 lignes>","lm_p4":"<valeur ajoutée pour ce poste, 2-3 lignes>"}';
 
   try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:3000,messages:[{role:"user",content:prompt}]})});
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey()},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:3000,messages:[{role:"user",content:prompt}]})});
     const d=await r.json();
     const raw=d.content?.find(b=>b.type==='text')?.text||'';
     result=JSON.parse(raw.replace(/```json|```/g,'').trim());
@@ -491,7 +533,52 @@ function showErr(m){const e=document.getElementById('err');e.textContent='⚠ '+
 function hideErr(){document.getElementById('err').classList.remove('on');}
 
 // INIT
-scorer();
+function afficherModal(){
+  document.getElementById('modalOverlay').style.display='flex';
+  document.getElementById('apiKeyInput').value = localStorage.getItem('gauto_api_key')||'';
+}
+function fermerModal(){
+  document.getElementById('modalOverlay').style.display='none';
+}
+function sauvegarderCle(){
+  const cle = document.getElementById('apiKeyInput').value.trim();
+  if(!cle.startsWith('sk-ant-')){
+    document.getElementById('modalErr').classList.add('on');
+    return;
+  }
+  document.getElementById('modalErr').classList.remove('on');
+  localStorage.setItem('gauto_api_key', cle);
+  fermerModal();
+  mettreAJourIndicateur();
+  scorer();
+}
+function mettreAJourIndicateur(){
+  const cle = getApiKey();
+  const dot = document.getElementById('apiDot');
+  const label = document.getElementById('apiLabel');
+  if(cle){
+    dot.style.background='var(--vert)';
+    dot.style.animation='pu 2s infinite';
+    label.textContent='Claude API · Actif';
+    label.style.color='var(--vert)';
+  } else {
+    dot.style.background='var(--or)';
+    dot.style.animation='none';
+    label.textContent='Claude API · Configurer';
+    label.style.color='var(--or)';
+  }
+}
+
+// Vérifier si clé existante au chargement
+if(getApiKey()){
+  document.getElementById('modalOverlay').style.display='none';
+  mettreAJourIndicateur();
+  scorer();
+} else {
+  // Afficher le modal si pas de clé
+  document.getElementById('modalOverlay').style.display='flex';
+  mettreAJourIndicateur();
+}
 </script>
 </body>
 </html>
