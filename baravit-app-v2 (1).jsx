@@ -4,7 +4,9 @@ import { createClient } from '@supabase/supabase-js';
 // Connexion à ta base de données (utilise tes clés .env)
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-const BaravitApp = () => {
+const SUPABASE_URL = "https://vzbcxppfytpfpfxxpunv.supabase.co";
+const SUPABASE_KEY "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6YmN4cHBmeXRwZnBmeHhwdW52Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2ODcxODQsImV4cCI6MjA5NDI2MzE4NH0.xnOns0uXW3s7y6ovqtihS-NX1UtW4_2FAqatwaI5j0s";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
   const [experienceBrute, setExperienceBrute] = useState("");
   const [etape, setEtape] = useState('offres'); // offres, profil, paiement
 
