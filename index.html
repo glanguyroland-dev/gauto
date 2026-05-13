@@ -3,10 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BARAVIT - IA Afrique</title>
+    <title>BARAVIT - IA Carrière Afrique</title>
+    <!-- Chargement des moteurs React directement -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Chargement de Babel pour lire le code JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://www.cinetpay.com/cdn/seamless/1.0.0/js/cinetpay.js"></script>
 </head>
-<body>
+<body style="margin: 0; background-color: #111; color: white;">
     <div id="root"></div>
-    <script type="module" src="/main.jsx"></script>
+    <!-- On dit au navigateur que le fichier main.jsx utilise Babel -->
+    <script type="text/babel" src="/main.jsx"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+const { useState } = React;
 
 const BaravitApp = () => {
   const [etape, setEtape] = useState('offres');
@@ -11,7 +11,7 @@ const BaravitApp = () => {
   ];
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#111', color: 'white', minHeight: '100vh', textAlign: 'center' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
       <h1 style={{ color: '#FFD700', fontSize: '3rem' }}>BARAVIT</h1>
       <p>L'infrastructure carrière de référence en Afrique</p>
 
@@ -35,14 +35,14 @@ const BaravitApp = () => {
           <button onClick={() => setEtape('offres')} style={{ color: '#FFD700', background: 'none', border: 'none', cursor: 'pointer' }}>← Retour</button>
           <h2>Déverse tes expériences (Pêle-mêle)</h2>
           <textarea 
-            style={{ width: '100%', height: '200px', borderRadius: '10px', padding: '15px', fontSize: '16px', border: 'none' }}
-            placeholder="Ex: J'ai été gérant de cabine, j'ai vendu des oranges..."
+            style={{ width: '100%', height: '200px', borderRadius: '10px', padding: '15px', fontSize: '16px', border: 'none', width: '100%', boxSizing: 'border-box', background: '#222', color: 'white' }}
+            placeholder="Ex: Gérant de cabine, vente de services..."
             value={texte}
             onChange={(e) => setTexte(e.target.value)}
           />
           <button 
-            onClick={() => alert("Profil en cours de génération par l'IA...")}
-            style={{ marginTop: '20px', backgroundColor: '#FFD700', color: 'black', border: 'none', padding: '20px', width: '100%', borderRadius: '10px', fontWeight: 'bold', fontSize: '18px' }}>
+            onClick={() => alert("Profil en cours de génération...")}
+            style={{ marginTop: '20px', backgroundColor: '#FFD700', color: 'black', border: 'none', padding: '20px', width: '100%', borderRadius: '10px', fontWeight: 'bold', fontSize: '18px', cursor: 'pointer' }}>
             GÉNÉRER MON PROFIL IA
           </button>
         </div>
@@ -51,4 +51,5 @@ const BaravitApp = () => {
   );
 };
 
-export default BaravitApp;
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<BaravitApp />);
