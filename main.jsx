@@ -1,99 +1,127 @@
-const { useState } = React;
+const { useState, useEffect } = React;
 
 const BaravitApp = () => {
   const [etape, setEtape] = useState('offres');
   const [texte, setTexte] = useState("");
-  const [profilGenere, setProfilGenere] = useState(null);
+  const [chargement, setChargement] = useState(false);
+  const [analyse, setAnalyse] = useState(null);
 
-  const offres = [
-    { id: 'gratuit', nom: 'GRATUIT', prix: '0 FCFA', icone: '🌱' },
-    { id: 'pro', nom: 'PRO', prix: '650 FCFA', icone: '🚀' },
-    { id: 'elite', nom: 'ELITE', prix: '15000 FCFA', icone: '👑' }
-  ];
+  // Simulation d'une IA fluide (Onboarding Premium)
+  const demarrerAnalyse = () => {
+    if (texte.length < 15) return alert("Détaillez un peu plus pour une précision IA optimale.");
+    setChargement(true);
+    setTimeout(() => {
+      const t = texte.toLowerCase();
+      let opportunites = [];
+      
+      // Moteur de mapping dynamique
+      if (t.includes("vente") || t.includes("gérant") || t.includes("caisse")) {
+        opportunites.push({ s: "Business & Retail", p: "Manager de Point de Vente", desc: "Optimisation de CA et gestion d'équipe." });
+      }
+      if (t.includes("enfant") || t.includes("école") || t.includes("église") || t.includes("pastorale")) {
+        opportunites.push({ s: "Social & Education", p: "Coordinateur de Programmes Jeunesse", desc: "Ingénierie pédagogique et médiation." });
+      }
+      if (t.includes("secrétaire") || t.includes("admin") || t.includes("pco")) {
+        opportunites.push({ s: "Operations", p: "Office Manager / Project Lead", desc: "Pilotage administratif et logistique." });
+      }
+      
+      if (opportunites.length === 0) {
+        opportunites.push({ s: "Stratégie", p: "Consultant Opérationnel", desc: "Adaptabilité et polyvalence métier." });
+      }
 
-  // LE MOTEUR DE GÉNÉRATION AUTOMATIQUE
-  const genererProfil = () => {
-    if (!texte.trim()) return alert("Veuillez saisir vos expériences d'abord !");
-    
-    // Analyse dynamique : BARAVIT extrait les opportunités selon les mots-clés
-    const analyse = {
-      titre: "Profil Multi-Potentiel & Leader Opérationnel",
-      competences: ["Coordination d'équipe", "Gestion administrative", "Pédagogie et Formation", "Communication Publique"],
-      opportunites: [
-        { secteur: "Administration", poste: "Assistante de Direction / Secrétaire de Direction" },
-        { secteur: "Événementiel", poste: "Chargée de Projet / Coordinatrice d'Événements" },
-        { secteur: "Social & Éducation", poste: "Responsable de Programme Junior / Éducatrice spécialisée" },
-        { secteur: "Management", poste: "Superviseure d'équipe de terrain" }
-      ]
-    };
+      setAnalyse(opportunites);
+      setChargement(false);
+      setEtape('resultat');
+    }, 2000); // Effet de réflexion IA
+  };
 
-    setProfilGenere(analyse);
-    setEtape('resultat');
+  // Styles Hyper Pro
+  const styles = {
+    container: { backgroundColor: '#050505', color: '#E0E0E0', minHeight: '100vh', fontFamily: "'Inter', sans-serif", padding: '40px 20px' },
+    card: { background: 'linear-gradient(145deg, #111, #080808)', border: '1px solid #222', borderRadius: '24px', padding: '32px', transition: 'all 0.3s ease' },
+    goldBtn: { backgroundColor: '#FFD700', color: '#000', border: 'none', padding: '16px 32px', borderRadius: '12px', fontWeight: '800', cursor: 'pointer', fontSize: '16px', letterSpacing: '0.5px' },
+    input: { width: '100%', background: '#0f0f0f', border: '1px solid #333', borderRadius: '16px', padding: '20px', color: '#fff', fontSize: '16px', outline: 'none', focus: { borderColor: '#FFD700' } }
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#111', color: 'white', minHeight: '100vh', textAlign: 'center' }}>
-      <h1 style={{ color: '#FFD700', fontSize: '2.5rem', marginBottom: '10px' }}>BARAVIT</h1>
-      
-      {/* ÉTAPE 1 : LES OFFRES */}
-      {etape === 'offres' && (
-        <div>
-          <p>L'infrastructure carrière de référence en Afrique</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
-            {offres.map(o => (
-              <div key={o.id} style={{ border: '2px solid #FFD700', padding: '20px', borderRadius: '15px', width: '250px', background: '#1a1a1a' }}>
-                <div style={{ fontSize: '50px' }}>{o.icone}</div>
-                <h2>{o.nom}</h2>
-                <p style={{ fontSize: '24px', fontWeight: 'bold' }}>{o.prix}</p>
-                <button onClick={() => setEtape('profil')} style={{ backgroundColor: '#FFD700', color: 'black', border: 'none', padding: '15px', width: '100%', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>DÉMARRER</button>
+    <div style={styles.container}>
+      {/* HEADER CORPORATE */}
+      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto 60px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '900', letterSpacing: '-1px' }}>BARA<span style={{ color: '#FFD700' }}>VIT</span>.</h1>
+        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '2px' }}>Infrastructure Carrière AI</div>
+      </nav>
+
+      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        
+        {/* ÉTAPE 1 : ONBOARDING PREMIUM */}
+        {etape === 'offres' && (
+          <div style={{ textAlign: 'center' }}>
+            <h2 style={{ fontSize: '48px', marginBottom: '20px' }}>Propulsez votre talent.</h2>
+            <p style={{ color: '#888', marginBottom: '50px', fontSize: '18px' }}>Choisissez votre niveau d'accélération pour le marché africain.</p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+              {['GRATUIT', 'PRO', 'ELITE'].map((nom, i) => (
+                <div key={nom} style={styles.card}>
+                  <div style={{ color: '#FFD700', fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>{i === 1 ? 'RECOMMANDÉ' : 'PLAN'}</div>
+                  <h3 style={{ fontSize: '24px', margin: '0 0 15px' }}>{nom}</h3>
+                  <div style={{ fontSize: '32px', fontWeight: '900', marginBottom: '30px' }}>{nom === 'GRATUIT' ? '0' : nom === 'PRO' ? '650' : '15.000'}<span style={{ fontSize: '14px', color: '#666' }}> FCFA</span></div>
+                  <button onClick={() => setEtape('profil')} style={styles.goldBtn}>Sélectionner</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ÉTAPE 2 : LE DÉVERSOIR (DUMP) */}
+        {etape === 'profil' && (
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '36px', marginBottom: '10px' }}>Intelligence Déversée.</h2>
+            <p style={{ color: '#888', marginBottom: '30px' }}>Ne structurez rien. Écrivez tout. Notre IA extrait votre génie.</p>
+            <textarea 
+              style={styles.input} 
+              rows="8" 
+              placeholder="Décrivez vos jobs, vos engagements, vos succès paroissiaux, vos ventes..." 
+              value={texte}
+              onChange={(e) => setTexte(e.target.value)}
+            />
+            <button 
+              onClick={demarrerAnalyse} 
+              style={{ ...styles.goldBtn, width: '100%', marginTop: '30px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            >
+              {chargement ? "Calcul des opportunités..." : "Générer mon infrastructure carrière"}
+            </button>
+          </div>
+        )}
+
+        {/* ÉTAPE 3 : RÉSULTAT ÉLITE */}
+        {etape === 'resultat' && (
+          <div style={{ animation: 'fadeIn 0.5s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+              <div>
+                <h2 style={{ fontSize: '40px', margin: '0' }}>Votre Matrice de Valeur</h2>
+                <p style={{ color: '#FFD700' }}>Analyse prédictive terminée.</p>
               </div>
-            ))}
+              <button onClick={() => setEtape('offres')} style={{ color: '#666', background: 'none', border: 'none', cursor: 'pointer' }}>Réinitialiser</button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
+              {analyse.map((item, i) => (
+                <div key={i} style={{ ...styles.card, borderLeft: '4px solid #FFD700' }}>
+                  <div style={{ color: '#FFD700', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '8px' }}>{item.s}</div>
+                  <h4 style={{ fontSize: '22px', margin: '0 0 10px' }}>{item.p}</h4>
+                  <p style={{ color: '#888', fontSize: '15px', lineHeight: '1.6' }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ marginTop: '50px', padding: '30px', borderRadius: '20px', background: '#111', textAlign: 'center' }}>
+              <p style={{ margin: '0 0 20px', color: '#888' }}>Prêt à transformer ces opportunités en contrat ?</p>
+              <button style={{ ...styles.goldBtn, background: 'none', color: '#FFD700', border: '1px solid #FFD700' }}>Télécharger mon CV Stratégique (PDF)</button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ÉTAPE 2 : LE DÉVERSOIR */}
-      {etape === 'profil' && (
-        <div style={{ maxWidth: '600px', margin: '40px auto', textAlign: 'left' }}>
-          <button onClick={() => setEtape('offres')} style={{ color: '#FFD700', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '20px' }}>← Retour aux offres</button>
-          <h2>Déverse tes expériences (Pêle-mêle)</h2>
-          <textarea 
-            style={{ width: '100%', height: '200px', borderRadius: '10px', padding: '15px', fontSize: '16px', background: '#222', color: 'white', border: '1px solid #444', boxSizing: 'border-box' }}
-            placeholder="Ex: J'ai été vice-présidente d'office paroissial, j'ai géré des enfants..."
-            value={texte}
-            onChange={(e) => setTexte(e.target.value)}
-          />
-          <button onClick={genererProfil} style={{ marginTop: '20px', backgroundColor: '#FFD700', color: 'black', border: 'none', padding: '20px', width: '100%', borderRadius: '10px', fontWeight: 'bold', fontSize: '18px', cursor: 'pointer' }}>GÉNÉRER MON PROFIL IA</button>
-        </div>
-      )}
-
-      {/* ÉTAPE 3 : LE RÉSULTAT (CE QUI MANQUAIT) */}
-      {etape === 'resultat' && profilGenere && (
-        <div style={{ maxWidth: '800px', margin: '40px auto', textAlign: 'left', background: '#1a1a1a', padding: '30px', borderRadius: '20px', border: '1px solid #FFD700' }}>
-          <h2 style={{ color: '#FFD700' }}>{profilGenere.titre}</h2>
-          <hr style={{ borderColor: '#333' }} />
-          
-          <h3>🚀 Compétences Clés Extraites :</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-            {profilGenere.competences.map((c, i) => (
-              <span key={i} style={{ background: '#333', padding: '8px 15px', borderRadius: '20px', fontSize: '14px', border: '1px solid #FFD700' }}>{c}</span>
-            ))}
-          </div>
-
-          <h3 style={{ marginTop: '30px' }}>🌍 Opportunités de Carrière Ouvertes :</h3>
-          <p style={{ fontSize: '14px', color: '#aaa' }}>L'IA BARAVIT a identifié ces chemins selon ton parcours :</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-            {profilGenere.opportunites.map((op, i) => (
-              <div key={i} style={{ background: '#222', padding: '15px', borderRadius: '10px', borderLeft: '4px solid #FFD700' }}>
-                <strong style={{ color: '#FFD700' }}>{op.secteur}</strong><br />
-                <span>{op.poste}</span>
-              </div>
-            ))}
-          </div>
-
-          <button onClick={() => setEtape('profil')} style={{ marginTop: '30px', background: 'none', border: '1px solid #FFD700', color: '#FFD700', padding: '10px 20px', borderRadius: '10px', cursor: 'pointer' }}>Modifier mes infos</button>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
