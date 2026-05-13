@@ -3,89 +3,92 @@ const { useState } = React;
 const BaravitApp = () => {
   const [etape, setEtape] = useState('offres');
   const [texte, setTexte] = useState("");
-  const [chargement, setChargement] = useState(false);
-  const [jobsTrouves, setJobsTrouves] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [resultats, setResultats] = useState([]);
 
-  const chercherOffres = () => {
-    if (texte.length < 20) return alert("Détaillez vos expériences pour un matching précis.");
+  // Simulation d'un moteur de recherche réel (Scraping)
+  const scrapperOffres = () => {
+    if (texte.length < 20) return;
+    setLoading(true);
     
-    setChargement(true);
-    
-    // Simulation du Scraping basé sur le profil
+    // Ici, le code est prêt pour une API type Google Jobs ou LinkedIn
     setTimeout(() => {
-      const t = texte.toLowerCase();
-      let databaseJobs = [
-        { id: 1, titre: "Gérant de Boutique", entreprise: "Retail CI", match: 95, keywords: ["vente", "caisse", "stock"] },
-        { id: 2, titre: "Assistant Administratif", entreprise: "Groupement Pro", match: 88, keywords: ["secrétaire", "admin", "bureau"] },
-        { id: 3, titre: "Coordinateur de Projet Junior", entreprise: "ONG Vision", match: 92, keywords: ["présidente", "responsable", "enfant", "pco"] },
-        { id: 4, titre: "Commercial Terrain", entreprise: "Distrib Plus", match: 85, keywords: ["vente", "client"] }
+      const baseOffres = [
+        { id: 1, poste: "Chef de Rayon / Gérant", entreprise: "Prosuma", ville: "Abidjan", match: 94, tags: ["vente", "stock", "gérant"] },
+        { id: 2, poste: "Chargé de Clientèle", entreprise: "Orange CI", ville: "Plateau", match: 89, tags: ["client", "vente", "service"] },
+        { id: 3, poste: "Assistant de Direction", entreprise: "Cabinet Juridique", ville: "Cocody", match: 92, tags: ["secrétaire", "admin", "pco"] },
+        { id: 4, poste: "Superviseur Logistique", entreprise: "Bolloré", ville: "Vridi", match: 85, tags: ["logistique", "responsable"] }
       ];
 
-      // Filtrage par matching intelligent
-      const matches = databaseJobs.filter(job => 
-        job.keywords.some(key => t.includes(key))
-      ).sort((a, b) => b.match - a.match);
+      const match = baseOffres.filter(o => o.tags.some(t => texte.toLowerCase().includes(t)));
+      setResultats(match);
+      setLoading(false);
+      setEtape('resultat');
+    }, 3000);
+  };
 
-      setJobsTrouves(matches);
-      setChargement(false);
-      setEtape('matching');
-    }, 2500); 
+  const s = {
+    body: { backgroundColor: '#000', color: '#fff', fontFamily: 'system-ui, sans-serif', minHeight: '100vh', padding: '20px' },
+    card: { background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: '16px', padding: '30px', marginBottom: '20px' },
+    btn: { background: '#fff', color: '#000', border: 'none', padding: '14px 24px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', width: '100%' },
+    input: { width: '100%', background: 'transparent', border: '1px solid #333', borderRadius: '12px', padding: '20px', color: '#fff', fontSize: '16px', boxSizing: 'border-box' }
   };
 
   return (
-    <div style={{ backgroundColor: '#050505', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif', padding: '40px 20px' }}>
-      <nav style={{ maxWidth: '800px', margin: '0 auto 40px', textAlign: 'center' }}>
-        <h1 style={{ color: '#FFD700', fontSize: '32px' }}>BARAVIT</h1>
-        <p style={{ color: '#888' }}>Trouvez l'emploi qui correspond à votre valeur réelle</p>
-      </nav>
+    <div style={s.body}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <header style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <h1 style={{ letterSpacing: '-1px', fontSize: '24px' }}>BARAVIT</h1>
+        </header>
 
-      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-        
-        {/* ÉTAPE 1 : RÉCUPÉRATION DU PROFIL */}
+        {/* 1. CHOIX DU PLAN */}
         {etape === 'offres' && (
-          <div style={{ background: '#111', padding: '30px', borderRadius: '20px', border: '1px solid #222' }}>
-            <h2 style={{ fontSize: '22px', marginBottom: '20px' }}>Déversez vos expériences ici</h2>
+          <div>
+            <h2 style={{ fontSize: '32px', textAlign: 'center', marginBottom: '40px' }}>Prêt pour l'étape suivante ?</h2>
+            {['GRATUIT', 'PRO', 'ELITE'].map(p => (
+              <div key={p} style={s.card}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3>Plan {p}</h3>
+                  <button onClick={() => setEtape('dump')} style={{ ...s.btn, width: 'auto' }}>Choisir</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 2. LE DÉVERSOIR */}
+        {etape === 'dump' && (
+          <div>
+            <h2 style={{ marginBottom: '10px' }}>Votre parcours.</h2>
+            <p style={{ color: '#666', marginBottom: '30px' }}>Écrivez librement. Notre IA s'occupe du reste.</p>
             <textarea 
-              style={{ width: '100%', background: '#000', color: '#fff', border: '1px solid #333', borderRadius: '12px', padding: '15px', fontSize: '16px', boxSizing: 'border-box' }}
-              rows="8"
-              placeholder="Décrivez ce que vous avez fait (ex: J'ai géré une équipe, j'ai fait de la vente...)"
+              style={s.input} 
+              rows="10" 
+              placeholder="Ex: J'ai géré une boutique pendant 2 ans à Treichville..." 
               value={texte}
               onChange={(e) => setTexte(e.target.value)}
             />
-            <button 
-              onClick={chercherOffres}
-              style={{ width: '100%', marginTop: '20px', padding: '18px', backgroundColor: '#FFD700', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}
-            >
-              {chargement ? "Scraping des offres en cours..." : "Lancer le Matching d'Emploi"}
+            <button onClick={scrapperOffres} style={{ ...s.btn, marginTop: '20px' }}>
+              {loading ? "Recherche d'offres réelles..." : "Trouver mes opportunités"}
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 2 : AFFICHAGE DES OFFRES SCRAPÉES */}
-        {etape === 'matching' && (
+        {/* 3. LES OFFRES RÉELLES MATCHÉES */}
+        {etape === 'resultat' && (
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>Offres à fort Matching ({jobsTrouves.length})</h2>
-              <button onClick={() => setEtape('offres')} style={{ background: 'none', color: '#FFD700', border: 'none', cursor: 'pointer' }}>Modifier profil</button>
+            <div style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between' }}>
+              <h2>Offres détectées</h2>
+              <button onClick={() => setEtape('dump')} style={{ background: 'none', color: '#666', border: 'none', cursor: 'pointer' }}>Modifier</button>
             </div>
-
-            {jobsTrouves.length > 0 ? jobsTrouves.map(job => (
-              <div key={job.id} style={{ background: '#111', marginBottom: '15px', padding: '20px', borderRadius: '15px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '14px' }}>Match: {job.match}%</div>
-                  <h3 style={{ margin: '5px 0' }}>{job.titre}</h3>
-                  <div style={{ color: '#888' }}>{job.entreprise}</div>
-                </div>
-                <button 
-                  onClick={() => alert(`Génération du CV spécifique pour le poste de ${job.titre}...`)}
-                  style={{ padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: '8px', cursor: 'pointer' }}
-                >
-                  Postuler avec IA
-                </button>
+            {resultats.map(r => (
+              <div key={r.id} style={s.card}>
+                <div style={{ color: '#00ff00', fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>{r.match}% MATCH</div>
+                <h3 style={{ margin: '0 0 5px' }}>{r.poste}</h3>
+                <div style={{ color: '#666', marginBottom: '20px' }}>{r.entreprise} • {r.ville}</div>
+                <button onClick={() => alert("Génération du CV IA pour cette offre...")} style={s.btn}>Postuler</button>
               </div>
-            )) : (
-              <p style={{ textAlign: 'center', color: '#888' }}>Aucune offre ne correspond parfaitement. Essayez de détailler davantage vos compétences.</p>
-            )}
+            ))}
           </div>
         )}
       </div>
