@@ -1,126 +1,93 @@
-const { useState, useEffect } = React;
+const { useState } = React;
 
 const BaravitApp = () => {
   const [etape, setEtape] = useState('offres');
   const [texte, setTexte] = useState("");
   const [chargement, setChargement] = useState(false);
-  const [analyse, setAnalyse] = useState(null);
+  const [jobsTrouves, setJobsTrouves] = useState([]);
 
-  // Simulation d'une IA fluide (Onboarding Premium)
-  const demarrerAnalyse = () => {
-    if (texte.length < 15) return alert("Détaillez un peu plus pour une précision IA optimale.");
+  const chercherOffres = () => {
+    if (texte.length < 20) return alert("Détaillez vos expériences pour un matching précis.");
+    
     setChargement(true);
+    
+    // Simulation du Scraping basé sur le profil
     setTimeout(() => {
       const t = texte.toLowerCase();
-      let opportunites = [];
-      
-      // Moteur de mapping dynamique
-      if (t.includes("vente") || t.includes("gérant") || t.includes("caisse")) {
-        opportunites.push({ s: "Business & Retail", p: "Manager de Point de Vente", desc: "Optimisation de CA et gestion d'équipe." });
-      }
-      if (t.includes("enfant") || t.includes("école") || t.includes("église") || t.includes("pastorale")) {
-        opportunites.push({ s: "Social & Education", p: "Coordinateur de Programmes Jeunesse", desc: "Ingénierie pédagogique et médiation." });
-      }
-      if (t.includes("secrétaire") || t.includes("admin") || t.includes("pco")) {
-        opportunites.push({ s: "Operations", p: "Office Manager / Project Lead", desc: "Pilotage administratif et logistique." });
-      }
-      
-      if (opportunites.length === 0) {
-        opportunites.push({ s: "Stratégie", p: "Consultant Opérationnel", desc: "Adaptabilité et polyvalence métier." });
-      }
+      let databaseJobs = [
+        { id: 1, titre: "Gérant de Boutique", entreprise: "Retail CI", match: 95, keywords: ["vente", "caisse", "stock"] },
+        { id: 2, titre: "Assistant Administratif", entreprise: "Groupement Pro", match: 88, keywords: ["secrétaire", "admin", "bureau"] },
+        { id: 3, titre: "Coordinateur de Projet Junior", entreprise: "ONG Vision", match: 92, keywords: ["présidente", "responsable", "enfant", "pco"] },
+        { id: 4, titre: "Commercial Terrain", entreprise: "Distrib Plus", match: 85, keywords: ["vente", "client"] }
+      ];
 
-      setAnalyse(opportunites);
+      // Filtrage par matching intelligent
+      const matches = databaseJobs.filter(job => 
+        job.keywords.some(key => t.includes(key))
+      ).sort((a, b) => b.match - a.match);
+
+      setJobsTrouves(matches);
       setChargement(false);
-      setEtape('resultat');
-    }, 2000); // Effet de réflexion IA
-  };
-
-  // Styles Hyper Pro
-  const styles = {
-    container: { backgroundColor: '#050505', color: '#E0E0E0', minHeight: '100vh', fontFamily: "'Inter', sans-serif", padding: '40px 20px' },
-    card: { background: 'linear-gradient(145deg, #111, #080808)', border: '1px solid #222', borderRadius: '24px', padding: '32px', transition: 'all 0.3s ease' },
-    goldBtn: { backgroundColor: '#FFD700', color: '#000', border: 'none', padding: '16px 32px', borderRadius: '12px', fontWeight: '800', cursor: 'pointer', fontSize: '16px', letterSpacing: '0.5px' },
-    input: { width: '100%', background: '#0f0f0f', border: '1px solid #333', borderRadius: '16px', padding: '20px', color: '#fff', fontSize: '16px', outline: 'none', focus: { borderColor: '#FFD700' } }
+      setEtape('matching');
+    }, 2500); 
   };
 
   return (
-    <div style={styles.container}>
-      {/* HEADER CORPORATE */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto 60px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '900', letterSpacing: '-1px' }}>BARA<span style={{ color: '#FFD700' }}>VIT</span>.</h1>
-        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '2px' }}>Infrastructure Carrière AI</div>
+    <div style={{ backgroundColor: '#050505', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif', padding: '40px 20px' }}>
+      <nav style={{ maxWidth: '800px', margin: '0 auto 40px', textAlign: 'center' }}>
+        <h1 style={{ color: '#FFD700', fontSize: '32px' }}>BARAVIT</h1>
+        <p style={{ color: '#888' }}>Trouvez l'emploi qui correspond à votre valeur réelle</p>
       </nav>
 
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
         
-        {/* ÉTAPE 1 : ONBOARDING PREMIUM */}
+        {/* ÉTAPE 1 : RÉCUPÉRATION DU PROFIL */}
         {etape === 'offres' && (
-          <div style={{ textAlign: 'center' }}>
-            <h2 style={{ fontSize: '48px', marginBottom: '20px' }}>Propulsez votre talent.</h2>
-            <p style={{ color: '#888', marginBottom: '50px', fontSize: '18px' }}>Choisissez votre niveau d'accélération pour le marché africain.</p>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-              {['GRATUIT', 'PRO', 'ELITE'].map((nom, i) => (
-                <div key={nom} style={styles.card}>
-                  <div style={{ color: '#FFD700', fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>{i === 1 ? 'RECOMMANDÉ' : 'PLAN'}</div>
-                  <h3 style={{ fontSize: '24px', margin: '0 0 15px' }}>{nom}</h3>
-                  <div style={{ fontSize: '32px', fontWeight: '900', marginBottom: '30px' }}>{nom === 'GRATUIT' ? '0' : nom === 'PRO' ? '650' : '15.000'}<span style={{ fontSize: '14px', color: '#666' }}> FCFA</span></div>
-                  <button onClick={() => setEtape('profil')} style={styles.goldBtn}>Sélectionner</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ÉTAPE 2 : LE DÉVERSOIR (DUMP) */}
-        {etape === 'profil' && (
-          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '36px', marginBottom: '10px' }}>Intelligence Déversée.</h2>
-            <p style={{ color: '#888', marginBottom: '30px' }}>Ne structurez rien. Écrivez tout. Notre IA extrait votre génie.</p>
+          <div style={{ background: '#111', padding: '30px', borderRadius: '20px', border: '1px solid #222' }}>
+            <h2 style={{ fontSize: '22px', marginBottom: '20px' }}>Déversez vos expériences ici</h2>
             <textarea 
-              style={styles.input} 
-              rows="8" 
-              placeholder="Décrivez vos jobs, vos engagements, vos succès paroissiaux, vos ventes..." 
+              style={{ width: '100%', background: '#000', color: '#fff', border: '1px solid #333', borderRadius: '12px', padding: '15px', fontSize: '16px', boxSizing: 'border-box' }}
+              rows="8"
+              placeholder="Décrivez ce que vous avez fait (ex: J'ai géré une équipe, j'ai fait de la vente...)"
               value={texte}
               onChange={(e) => setTexte(e.target.value)}
             />
             <button 
-              onClick={demarrerAnalyse} 
-              style={{ ...styles.goldBtn, width: '100%', marginTop: '30px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              onClick={chercherOffres}
+              style={{ width: '100%', marginTop: '20px', padding: '18px', backgroundColor: '#FFD700', color: '#000', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}
             >
-              {chargement ? "Calcul des opportunités..." : "Générer mon infrastructure carrière"}
+              {chargement ? "Scraping des offres en cours..." : "Lancer le Matching d'Emploi"}
             </button>
           </div>
         )}
 
-        {/* ÉTAPE 3 : RÉSULTAT ÉLITE */}
-        {etape === 'resultat' && (
-          <div style={{ animation: 'fadeIn 0.5s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
-              <div>
-                <h2 style={{ fontSize: '40px', margin: '0' }}>Votre Matrice de Valeur</h2>
-                <p style={{ color: '#FFD700' }}>Analyse prédictive terminée.</p>
-              </div>
-              <button onClick={() => setEtape('offres')} style={{ color: '#666', background: 'none', border: 'none', cursor: 'pointer' }}>Réinitialiser</button>
+        {/* ÉTAPE 2 : AFFICHAGE DES OFFRES SCRAPÉES */}
+        {etape === 'matching' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h2>Offres à fort Matching ({jobsTrouves.length})</h2>
+              <button onClick={() => setEtape('offres')} style={{ background: 'none', color: '#FFD700', border: 'none', cursor: 'pointer' }}>Modifier profil</button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
-              {analyse.map((item, i) => (
-                <div key={i} style={{ ...styles.card, borderLeft: '4px solid #FFD700' }}>
-                  <div style={{ color: '#FFD700', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '8px' }}>{item.s}</div>
-                  <h4 style={{ fontSize: '22px', margin: '0 0 10px' }}>{item.p}</h4>
-                  <p style={{ color: '#888', fontSize: '15px', lineHeight: '1.6' }}>{item.desc}</p>
+            {jobsTrouves.length > 0 ? jobsTrouves.map(job => (
+              <div key={job.id} style={{ background: '#111', marginBottom: '15px', padding: '20px', borderRadius: '15px', border: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ color: '#FFD700', fontWeight: 'bold', fontSize: '14px' }}>Match: {job.match}%</div>
+                  <h3 style={{ margin: '5px 0' }}>{job.titre}</h3>
+                  <div style={{ color: '#888' }}>{job.entreprise}</div>
                 </div>
-              ))}
-            </div>
-            
-            <div style={{ marginTop: '50px', padding: '30px', borderRadius: '20px', background: '#111', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 20px', color: '#888' }}>Prêt à transformer ces opportunités en contrat ?</p>
-              <button style={{ ...styles.goldBtn, background: 'none', color: '#FFD700', border: '1px solid #FFD700' }}>Télécharger mon CV Stratégique (PDF)</button>
-            </div>
+                <button 
+                  onClick={() => alert(`Génération du CV spécifique pour le poste de ${job.titre}...`)}
+                  style={{ padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid #FFD700', color: '#FFD700', borderRadius: '8px', cursor: 'pointer' }}
+                >
+                  Postuler avec IA
+                </button>
+              </div>
+            )) : (
+              <p style={{ textAlign: 'center', color: '#888' }}>Aucune offre ne correspond parfaitement. Essayez de détailler davantage vos compétences.</p>
+            )}
           </div>
         )}
-
       </div>
     </div>
   );
